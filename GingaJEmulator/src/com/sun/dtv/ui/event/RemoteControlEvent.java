@@ -1,0 +1,211 @@
+    package com.sun.dtv.ui.event;
+
+import com.sun.dtv.lwuit.Component;
+import com.sun.dtv.resources.ResourceTypeListener;
+import com.sun.dtv.resources.ScarceResourceListener;
+import com.sun.dtv.resources.TimeoutException;
+
+import java.util.List;
+import java.util.ArrayList;
+
+public class RemoteControlEvent extends KeyEvent
+{
+	// Colored key 0 key code. A remote control may have up to six colored keys.
+	public static final int VK_COLORED_KEY_0 = 33;
+	// Colored key 1 key code.  A remote control may have up to six colored keys.
+	public static final int VK_COLORED_KEY_1 = 34;
+	// Colored key 2 key code.  A remote control may have up to six colored keys.
+	public static final int VK_COLORED_KEY_2 = 35;
+	// Colored key 3 key code.  A remote control may have up to six colored keys.
+	public static final int VK_COLORED_KEY_3 = 36;
+	// Colored key 4 key code.  A remote control may have up to six colored keys.
+	public static final int VK_COLORED_KEY_4 = 37;
+	// Colored key 5 key code.  A remote control may have up to six colored keys.
+	public static final int VK_COLORED_KEY_5 = 38;
+	// Device power on/off key code.
+	public static final int VK_POWER = 39;
+	// Device dimmer key code.
+	public static final int VK_DIMMER = 40;
+	// Device wink key code.
+	public static final int VK_WINK = 41;
+	// Rewind (REW) button key code.
+	public static final int VK_REWIND = 42;
+	// Stop (STOP) button key code.
+	public static final int VK_STOP = 43;
+	// Eject button key code.
+	public static final int VK_EJECT = 44;
+	// Play (PLAY) button key code.
+	public static final int VK_PLAY = 45;
+	// Record (REC) button key code.
+	public static final int VK_RECORD = 46;
+	// Fast forward (FF) button key code.
+	public static final int VK_FF = 47;
+	// Increase media speed key code.
+	public static final int VK_PLAY_SPEED_UP = 48;
+	// Decrease media speed key code.
+	public static final int VK_PLAY_SPEED_DOWN = 49;
+	// Reset media speed key code.
+	public static final int VK_PLAY_SPEED_RESET = 50;
+	// Go to next position key code.
+	public static final int VK_GO_TO_NEXT = 51;
+	// Go to start position key code.
+	public static final int VK_GO_TO_START = 52;
+	// Go to end position key code.
+	public static final int VK_GO_TO_END = 53;
+	// Go to previous position key code.
+	public static final int VK_GO_TO_PREV = 54;
+	// Random play key code.
+	public static final int VK_RANDOM_PLAY = 55;
+	// Channel up key code.
+	public static final int VK_CHANNEL_UP = 56;
+	// Channel down key code.
+	public static final int VK_CHANNEL_DOWN = 57;
+	// Scan channel key code.
+	public static final int VK_SCAN_CHANNEL = 58;
+	// Picture in picture (PIP) key code.
+	public static final int VK_PIP = 59;
+	// Split screen key code.
+	public static final int VK_SPLIT_SCREEN = 60;
+	// Display swap key code.
+	public static final int VK_DISPLAY_SWAP = 61;
+	// Screen mode change key code.
+	public static final int VK_SCREEN_MODE = 62;
+	// Video mode change key code.
+	public static final int VK_VIDEO_MODE = 63;
+	// Volume up key code.
+	public static final int VK_VOLUME_UP = 64;
+	// Volume down key code.
+	public static final int VK_VOLUME_DOWN = 65;
+	// Mute key code.
+	public static final int VK_MUTE = 66;
+	// Surround mode change key code.
+	public static final int VK_SURROUND_MODE = 67;
+	// Balance right key code.
+	public static final int VK_BALANCE_RIGHT = 68;
+	// Balance left key code.
+	public static final int VK_BALANCE_LEFT = 69;
+	// Fader front key code.
+	public static final int VK_FADER_FRONT = 70;
+	// Fader rear key code.
+	public static final int VK_FADER_REAR = 71;
+	// Bass up key code.
+	public static final int VK_BASS_UP = 72;
+	// Bass down key code.
+	public static final int VK_BASS_DOWN = 73;
+	// Info key code.
+	public static final int VK_INFO = 74;
+	// Program guide key code.
+	public static final int VK_GUIDE = 75;
+	// Teletext key code.
+	public static final int VK_TELETEXT = 76;
+	// Subtitle mode change key code.
+	public static final int VK_SUBTITLE_MODE = 77;
+	// Confirm key code.
+	public static final int VK_CONFIRM = 80;
+	// Back key code.
+	public static final int VK_BACK = 81;
+	// Menu key code.
+	public static final int VK_MENU = 82; 
+	// Any colored key.
+	public static final int VK_COLORED = 96;
+	// Any arrow key.
+	public static final int VK_ARROWS = 97;
+
+	/**
+	 * Constructs a RemoteControlEvent object.
+	 *
+	 * 
+	 * @param source - the Component that originated the event
+	 * @param id - an integer identifying the type of event
+	 * @param when - a long integer that specifies the time the event occurred
+	 * @param modifiers - the modifier keys down during event (shift, ctrl, alt,  meta) Either extended _DOWN_MASK or old _MASK modifiers should be used, but both models should not be mixed in one event. Use of the extended modifiers is preferred.
+	 * @param keyCode - the integer code for an actual key, or VK_UNDEFINED (for a key-typed event) (as defined in java.awt.event.KeyEvent)
+	 * @param keyChar - the Unicode character generated by this event, or CHAR_UNDEFINED (for key-pressed and key-released events which do not map to a valid Unicode character) (as defined in java.awt.event.KeyEvent)
+	 * @see KeyEvent
+	 */
+	public RemoteControlEvent( Component source, int id, long when, int modifiers, int keyCode, char keyChar)
+	{
+		super(source, id, when, modifiers, keyCode, keyChar);
+	}
+
+	/**
+	 * Returns a reserved instance out of the pool of all
+	 * <code>RemoteControlEvent</code> instances. This method either returns
+	 * with the instance or throws an exception according to the situation.
+	 * 
+	 *This method behaves exactly as the <code>reserve()</code> method.</p>
+	 * This method overrides the one defined in <A HREF="../../../../../com/sun/dtv/ui/event/KeyEvent.html" title="class in com.sun.dtv.ui.event"><CODE>KeyEvent</CODE></A>.
+	 *
+	 * 
+	 * @param force - If true, this method is allowed to withdraw any given resource from its current owner. If false, the implementation will block and wait until a resource of the given type is made available (using release()) or until timeoutms milliseconds.
+	 * @param timeoutms - A positive amount of time in millisecond until which this method will wait for any resource to be released by its current owner. The value of -1 indicates that the implementation will wait forever.
+	 * @param listener - The listener to be attached to receive notification about the status of the resource.
+	 * @return The instance of type RemoteControlEvent that has been reserved.
+	 * @throws IllegalArgumentException - If listener is null or if the value specified in timeoutms is not valid i.e. not either a positive integer or -1.
+	 * @throws TimeoutException - If the time specified in timeoutms is over and the resource could not be reserved.
+	 * @see KeyEvent.reserve(boolean, long, com.sun.dtv.resources.ScarceResourceListener)
+	 */
+	public static KeyEvent reserveOne(int keyCode, boolean force, long timeoutms, ScarceResourceListener listener) throws IllegalArgumentException, TimeoutException
+	{
+		KeyEvent keyEvent = new KeyEvent(null, java.awt.event.KeyEvent.KEY_PRESSED, 0L, 0, keyCode,
+				java.awt.event.KeyEvent.CHAR_UNDEFINED);
+		
+		keyEvent.reserve(force, timeoutms, listener);
+		
+		return keyEvent;
+	}
+
+	/**
+	 * Return the list of all existing instances of <A HREF="../../../../../com/sun/dtv/ui/event/RemoteControlEvent.html" title="class in com.sun.dtv.ui.event"><CODE>RemoteControlEvent</CODE></A>, whether they are already
+	 * reserved or not.
+	 * This method overrides the one defined in <A HREF="../../../../../com/sun/dtv/ui/event/KeyEvent.html" title="class in com.sun.dtv.ui.event"><CODE>KeyEvent</CODE></A>.
+	 *
+	 * 
+	 * 
+	 * @return list of all existing instances of RemoteControlEvent
+	 */
+	public static KeyEvent[] getInstances()
+	{
+		KeyEvent[] keyEventArray = new KeyEvent[vector.size()];
+		for(int i = 0; i < vector.size(); i++){
+			keyEventArray[i] = (KeyEvent)vector.get(i);
+		}
+		
+		return keyEventArray;
+	}
+
+	/**
+	 * Adds a <code>ResourceTypeListener</code> to the implementation.
+	 * Whenever a <code>reserve()</code> or a <code>release()</code> is
+	 * called on any resources of the same type, the implementation will
+	 * call the listener's corresponding methods.
+	 *
+	 * 
+	 * @param listener - The listener that is triggered for events on resources of the same type.
+	 * @throws NullPointerException - If listener is null.
+	 * @see removeResourceTypeListener(com.sun.dtv.resources.ResourceTypeListener)
+	 */
+	public static void addResourceTypeListener( ResourceTypeListener listener) throws NullPointerException
+	{
+		if (!resourceListenersList.contains((Object)listener)) {
+			resourceListenersList.add((Object)listener);
+		}
+	}
+
+	/**
+	 * Removes a previously attached listener. If the listener was not attached
+	 * before, this method does nothing.
+	 *
+	 * 
+	 * @param listener - The listener that is triggered for events on resources of the same type.
+	 * @throws NullPointerException - If listener is null.
+	 * @see addResourceTypeListener(com.sun.dtv.resources.ResourceTypeListener)
+	 */
+	public static void removeResourceTypeListener(ResourceTypeListener listener) throws NullPointerException
+	{
+		if (resourceListenersList.contains((Object)listener)) {
+			resourceListenersList.remove((Object)listener);
+		}
+	}
+
+}

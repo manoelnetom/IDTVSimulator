@@ -1,0 +1,376 @@
+/******************************************************************************
+ * Este arquivo eh parte da implementacao do Projeto OpenGinga
+ *
+ * Direitos Autorais Reservados (c) 2005-2009 UFPB/LAVID
+ *
+ * Este programa eh software livre; voce pode redistribui-lo e/ou modificah-lo sob
+ * os termos da Licenca Publica Geral GNU versao 2 conforme publicada pela Free
+ * Software Foundation.
+ *
+ * Este programa eh distribuido na expectativa de que seja util, porem, SEM
+ * NENHUMA GARANTIA; nem mesmo a garantia implicita de COMERCIABILIDADE OU
+ * ADEQUACAO A UMA FINALIDADE ESPECIFICA. Consulte a Licenca Publica Geral do
+ * GNU versao 2 para mais detalhes.
+ *
+ * Voce deve ter recebido uma copia da Licenca Publica Geral do GNU versao 2 junto
+ * com este programa; se nao, escreva para a Free Software Foundation, Inc., no
+ * endereco 59 Temple Street, Suite 330, Boston, MA 02111-1307 USA.
+ *
+ * Para maiores informacoes:
+ * ginga @ lavid.ufpb.br
+ * http://www.openginga.org
+ * http://www.ginga.org.br
+ * http://www.lavid.ufpb.br
+ * ******************************************************************************
+ * This file is part of OpenGinga Project
+ *
+ * Copyright: 2005-2009 UFPB/LAVID, All Rights Reserved.
+ *
+ * This program is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License version 2 as published by
+ * the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+ * PARTICULAR PURPOSE.  See the GNU General Public License version 2 for more
+ * details.
+ *
+ * You should have received a copy of the GNU General Public License version 2
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
+ *
+ * For further information contact:
+ * ginga @ lavid.ufpb.br
+ * http://www.openginga.org
+ * http://www.ginga.org.br
+ * http://www.lavid.ufpb.br
+ * *******************************************************************************/
+package com.sun.dtv.filtering;
+
+import com.sun.dtv.transport.ConditionalAccessDeniedException;
+import java.util.LinkedList;
+
+/**
+ * 
+ */
+public class DataSectionFilter implements Cloneable
+{
+	protected int pid;
+	protected int tableId;
+	protected long timeOut;
+	protected byte[] positiveFilter;
+	protected byte[] positiveMask;
+	protected LinkedList listListeners;
+//	protected int id;
+	protected Object refObj;
+	
+	DataSectionFilter(){
+//		id=-1;
+		this.positiveFilter = new byte[32];
+		this.positiveMask = new byte[32];
+		this.listListeners = new LinkedList();
+	}
+	/**
+	 * Sets or changes the value of the PID for use in filtering packets.
+	 * This method MUST be called at least once before the filter is used
+	 *
+	 * 
+	 * @param pid - the value of the PID to filter for in incoming sections. Must be a 13 bit field value between 0 and 0x1FFF
+	 * @throws InvalidFilterException - if the pid is not a valid value between 0 and 0x1FFF
+	 */
+
+	public void setPid(int pid) throws InvalidFilterException
+	{
+		if(pid<0 || pid>8191)
+			throw new InvalidFilterException();
+		this.pid = pid;
+	}
+
+	/**
+	 * Sets or changes the value of the table_id for use in filtering packets.
+	 *
+	 * 
+	 * @param table_id - the value of the table_id to filter for in incoming sections Must be an 8 bit field value between 0 and 0xFF
+	 * @throws InvalidFilterException - if the table_id is not a valid value between 0 and 0xFF
+	 */
+	public void setTableId(int table_id) throws InvalidFilterException
+	{
+		if(table_id<0 || table_id>255)
+			throw new InvalidFilterException();
+		this.tableId = table_id;
+	}
+
+	/**
+	 * Clears ant table_id value previously set.
+	 *
+	 * If the filter is attached to a transport stream, the filter will not
+	 * longer filter on the table_id filter of data sections.
+	 *
+	 * 
+	 * 
+	 * @throws InvalidFilterException - A TableSectionFilter must have the table_id field set.
+	 */
+	public void clearTableId() throws InvalidFilterException
+	{
+		//TODO implement clearTableId
+	}
+
+	/**
+	 * Defines a filter based on specifying of a set of bit positions which, when
+	 * corresponding values in section data are concatenated and interpreted as
+	 * an integer value, will be EQUAL TO the integer generated from the corresponding
+	 * in the same definition array.
+	 *
+	 * 
+	 * If the associated <code>DataSectionFilterCollection</code> is connected to a
+	 * <code>TransportStream</code> then filtering will immediately start using
+	 * these greater than filter parameters.
+	 *
+	 * 
+	 * @param offset - defines the offset within the section which the first byte of the positiveFilterDef and positiveFilterMask arrays are intended to match. The offset must be greater than or equal to 3 and less than 31
+	 * @param positiveFilterDef - defines an integer value generated by selecting bits according to the supplied mask and concatenating them.
+	 * @param positiveFilterMask - defines which bits in the positiveFilterDef should be selected for the equal to comparison.
+	 * @throws InvalidFilterException - if the offset is not a valid value, if the arrays are not of the same length, if the offset and array length would cause the filter to extend beyond the native filter's capacity, or if the bit positions selected in the masks have already been selected in a different filter's mask array
+	 */
+	public void setPositiveFilter(int offset, byte[] positiveFilterDef, byte[] positiveFilterMask) throws InvalidFilterException
+	{
+		if(offset<3 || offset>31 || positiveFilterDef.length < offset || positiveFilterMask.length < offset)
+			throw new InvalidFilterException();
+		for(int i = offset;i<32;i++){
+			this.positiveFilter[i] = positiveFilterDef[i];
+			this.positiveMask[i] = positiveFilterMask[i];
+		}
+		//TODO If the associated DataSectionFilterCollection is connected to a TransportStream then filtering will immediately start using these greater than filter parameters. 
+	}
+
+	/**
+	 * Clears and deactivates any previously set positive filter parameters.
+	 *
+	 * If the filter is connected to a transport stream, the positive filter parameters
+	 * will no longer be used to match section data.
+	 *
+	 * 
+	 */
+	public void clearPositiveFilter()
+	{
+		for(int i = 0;i<32;i++){
+			this.positiveMask[i] = 0;
+		}
+	}
+
+	/**
+	 * Defines a filter based on specifying of a set of bit positions which, when
+	 * corresponding values in a data section are concatenated and interpreted as
+	 * an integer value, will be GREATER THAN the integer generated from the corresponding
+	 * in the same definition array.
+	 *
+	 * 
+	 * If the associated <code>DataSectionFilterCollection</code> is connected to a
+	 * <code>TransportStream</code> then filtering will immediately start using
+	 * these greater than filter parameters.
+	 *
+	 * 
+	 * @param offset - defines the offset within the section which the first byte of the greaterThanFilterDef and greaterThanFilterMask arrays are intended to match. The offset must be greater than or equal to 3 and less than 31
+	 * @param greaterThanFilterDef - defines an integer value generated by selecting bits according to the supplied mask and concatenating them.
+	 * @param greaterThanFilterMask - defines which bits in the greaterThanFilterDef should be selected for the greater than comparison.
+	 * @throws InvalidFilterException - if the offset is not a valid value, if the arrays are not of the same length, if the offset and array length would cause the filter to extend beyond the native filter's capacity, or if the bit positions selected in the mask have already been selected in a different filter's mask array
+	 */
+	public void setGreaterThanFilter(int offset, byte[] greaterThanFilterDef, byte[] greaterThanFilterMask) throws InvalidFilterException
+	{
+		//TODO implement setGreaterThanFilter
+	}
+
+	/**
+	 * Clears and deactivates any previously set greaterThan filter parameters.
+	 *
+	 * If the filter is connected to a transport stream, the greaterThan filter parameters
+	 * will no longer be used to match section data.
+	 *
+	 * 
+	 */
+	public void clearGreaterThanFilter()
+	{
+		//TODO implement clearGreaterThanFilter
+	}
+
+	/**
+	 * Defines a filter based on specifying of a set of bit positions which, when
+	 * corresponding values in a data section are concatenated and interpreted as
+	 * an integer value, will be LESS THAN the integer generated from the corresponding
+	 * in the same definition array.
+	 *
+	 * 
+	 * If the associated <code>DataSectionFilterCollection</code> is connected to a
+	 * <code>TransportStream</code> then filtering will immediately start using
+	 * these less than filter parameters.
+	 *
+	 * 
+	 * @param offset - defines the offset within the section which the first byte of the lessThanFilterDef and lessThanFilterMask arrays are intended to match. The offset must be less than or equal to 3 and less than 31
+	 * @param lessThanFilterDef - defines an integer value generated by selecting bits according to the supplied mask and concatenating them.
+	 * @param lessThanFilterMask - defines which bits in the lessThanFilterDef should be selected for the less than comparison.
+	 * @throws InvalidFilterException - if the offset is not a valid value, if the arrays are not of the same length, if the offset and array length would cause the filter to extend beyond the native filter's capacity, or if the bit positions selected in the mask have already been selected in a different filter's mask array
+	 */
+	public void setLessThanFilter(int offset, byte[] lessThanFilterDef, byte[] lessThanFilterMask) throws InvalidFilterException
+	{
+		//TODO implement setLessThanFilter
+	}
+
+	/**
+	 * Clears and deactivates any previously set lessThan filter parameters.
+	 *
+	 * If the filter is connected to a transport stream, the lessThan filter parameters
+	 * will no longer be used to match section data.
+	 *
+	 * 
+	 */
+	public void clearLessThanFilter()
+	{
+		//TODO implement clearLessThanFilter
+	}
+
+	/**
+	 * Sets xor data and mask arrays such that bits in the section content
+	 * specified by the xorZeroMask will evaluate to zero when xor'd with the
+	 * corresponding xorData bits, and bits specified by the xorOneMask will
+	 * evaluate to one when xor'd with the corresponding xorData bits.
+	 * 
+	 *
+	 * The Mask arrays select bits with a value of 0. Bits in the mask with a
+	 * value of 1 will not be xor'd and will have no bearing on a section
+	 * matching the filter.
+	 * 
+	 *
+	 * The following pseudo code illustrates how these logical operations
+	 * match a section.
+	 * 
+	 * <pre class="codeSample">
+	 * if ((sectionData ^ xorData) & ~xorZeroMask == 0 &&
+	 * ((sectionData ^ xorData) & ~xorOneMask) ^ ~xorOneMask > 0) {
+	 * //SECTION MATCH FOUND
+	 * }
+	 * </pre>
+	 * 
+	 *
+	 * Note that to avoid an obvious conflict, the xorZeroMask and
+	 * xorOneMask contents must not select the same bits for xor checking
+	 * (as an xor result can not be both one and zero). In effect this
+	 * enforces the logical requirement,
+	 * <code>(~xorOneMask) & (~xorOneMask) = 0</code>.
+	 * 
+	 *
+	 * If the associated <code>DataSectionFilterCollection</code> is
+	 * connected to a <code>TransportStream</code> then filtering will
+	 * immediately start using these xor filter parameters.
+	 *
+	 * 
+	 * @param offset - Defines the offset within the section which the first byte of the xorData and xorZeroMask arrays is intended to match. The offset must be greater than or equal to 3 and less than 31.
+	 * @param xorData - Defines values which should resolve to "0" when bits specified by the xorZeroMask are xor'd with the section data, and resolve to "1" when bits specified by the xorOneMask are xor'd with the section data.
+	 * @param xorZeroMask - Defines which bits in the section must resolve to "0" when xor'd with the xorData. A bit with value "0" marks the bit to be xor'd.
+	 * @param xorOneMask - Defines which bits in the section must resolve to "1" when xor'd with the xorData. A bit with value "0" marks the bit to be xor'd.
+	 * @throws InvalidFilterException - If the arrays are not of the same length, if the xormasks overlap, if the offset is not a valid value, if the offset and array length would cause the filter to extend beyond the native filter's capacity, or if the bit positions selected in the masks have already been selected in a different filter's mask array.
+	 */
+	public void setXorFilter(int offset, byte[] xorData, byte[] xorZeroMask, byte[] xorOneMask) throws InvalidFilterException
+	{
+		//TODO implement setXorFilter
+	}
+
+	/**
+	 * Clears and deactivates any previously set xor filter parameters.
+	 *
+	 * If the filter is connected to a transport stream, the xor filter parameters
+	 * will no longer be used to match section data.
+	 *
+	 * 
+	 */
+	public void clearXorFilter()
+	{
+		//TODO implement clearXorFilter
+	}
+
+	/**
+	 * Sets a filter into the "started" state. Once the filter is attached to a
+	 * transport stream through the <code>DataFilterCollection</code> method connect()
+	 * being called, the filter native resources are allocated and filtering begins
+	 * with the parameters defined for this filter.
+	 * If the filter is already part of an attached <code>DataSectionFilterCollection</code>
+	 * then this filters parameters become active
+	 *
+	 * 
+	 * @param refObj - An object supplied by the application for use as as an internal reference within the application to uniquely identify the filter operation. If not null, the object will be provided with all DataSectionFilterEvent deliveries.
+	 * @throws FilterResourceUnavailableException - if all the number of started DataSectionFilter s for the containing DataSectionFilterCollection is already equal to the number of section filters reserved for the DataSectionFilterCollection when it was created.
+	 * @throws ConditionalAccessDeniedException - if the information requested is scrambled and permission to descramble it is refused.
+	 * @throws InvalidFilterException - Insufficient filter parameters have been supplied to permit the filter to start. A ListFilter must have the table_id field set. Also thrown if the offset and length of the xorData, xorZeroMask and xorOneMask arrays cause filtering to extend beyond the native filtering capacity.
+	 * @throws DisconnectedException - if the parent DataSectionFilterCollection has lost it's connection to a transport stream since it was connected.
+	 */
+	public void startFiltering( Object refObj) throws FilterResourceUnavailableException, ConditionalAccessDeniedException, InvalidFilterException, DisconnectedException
+	{
+		this.refObj = refObj;
+	}
+
+	/**
+	 * Stops filtering of this <code>DataSectionFilter</code> in the parent <code>DataSectionFilterCollection</code>.
+	 * Connecting the parent <code>DataSectionFilterCollection</code> to a transport stream will not start filtering
+	 * of this <code>DataSectionFilter</code>.
+	 *
+	 * 
+	 */
+	public void stopFiltering()
+	{
+		//TODO implement stopFiltering
+	}
+
+	/**
+	 * Sets the timeout of the <code>DataSectionFilter</code>. A
+	 * <code>TimeOutEvent</code> will be sent to all
+	 * <code>FilterEventListener</code>. when the timeout occurs. Filtering
+	 * will also be stopped.
+	 * 
+	 *For a <code>SingleFilter</code> this will be generated if no sections
+	 * arrive within the specified period. For a <code>ListFilter</code>, this
+	 * will be generated if the complete table does not arrive within the
+	 * specified time. For a <code>CircularFilter</code>, this will be
+	 * generated if the specified time has elapsed since the arrival of the
+	 * last section being successfully filtered.</p>
+	 * 
+	 *Specifying a timeout of 0 removes the timeout resulting in no further
+	 * <code>TimeOutEvent</code> in subsequent filter activations, but not
+	 * filter activation already in progress. The default timeout value is
+	 * 0.</p>
+	 *
+	 * 
+	 * @param milliseconds - The time out period.
+	 * @throws IllegalArgumentException - If the 'milliseconds' parameter is negative.
+	 */
+	public void setTimeOut(long milliseconds) throws IllegalArgumentException
+	{
+		if(milliseconds<0)
+		this.timeOut = milliseconds;
+	}
+
+	/**
+	 * Adds a <code>FilterEventListener</code> to receive events of the
+	 * <code>DataSectionFilter</code> object.
+	 *
+	 * 
+	 * @param listener - the FilterEventListener to receive the events.
+	 * @see removeSectionFilterListener(com.sun.dtv.filtering.FilterEventListener)
+	 */
+	public void addSectionFilterListener( FilterEventListener listener)
+	{
+		this.listListeners.add(listener);
+	}
+
+	/**
+	 * Removes the specified the <code>FilterEventListener</code> which will no longer remove events
+	 * from the <code>DataSectionFilter</code>.
+	 *
+	 * 
+	 * @param listener - the FilterEventListener to be removed.
+	 * @see addSectionFilterListener(com.sun.dtv.filtering.FilterEventListener)
+	 */
+	public void removeSectionFilterListener( FilterEventListener listener)
+	{
+		this.listListeners.remove(listener);
+	}
+
+}

@@ -1,0 +1,47 @@
+<APPLICATIONS>
+    <APPLICATION>
+        <NAME>Buttons</NAME>
+        <PATH>xlets/Buttons</PATH>
+        <XLET>ButtonsXlet</XLET>
+    </APPLICATION>
+    <APPLICATION>
+        <NAME>Cabelo Teste</NAME>
+        <PATH>xlets/Cabelo</PATH>
+        <XLET>CabeloXlet</XLET>
+    </APPLICATION>
+    <APPLICATION>
+        <NAME>Dinamico</NAME>
+        <PATH>xlets/Dinamico</PATH>
+        <XLET>DinamicoXlet</XLET>
+    </APPLICATION>
+    <APPLICATION>
+        <NAME>Events</NAME>
+        <PATH>xlets/Events</PATH>
+        <XLET>EventsXlet</XLET>
+    </APPLICATION>
+    <APPLICATION>
+        <NAME>Image</NAME>
+        <PATH>build/classes/xlet</PATH>
+        <XLET>ImageXlet</XLET>
+    </APPLICATION>
+    <APPLICATION>
+        <NAME>Label</NAME>
+        <PATH>xlets/Label</PATH>
+        <XLET>LabelXlet</XLET>
+    </APPLICATION>
+    <APPLICATION>
+        <NAME>List</NAME>
+        <PATH>xlets/List</PATH>
+        <XLET>ListXlet</XLET>
+    </APPLICATION>
+    <APPLICATION>
+        <NAME>TabbedList</NAME>
+        <PATH>xlets/TabbedList</PATH>
+        <XLET>TabbedListXlet</XLET>
+    </APPLICATION>
+    <APPLICATION>
+        <NAME>TabbedRadio</NAME>
+        <PATH>xlets/TabbedRadio</PATH>
+        <XLET>TabbedRadioXlet</XLET>
+    </APPLICATION>
+</APPLICATIONS>

@@ -1,0 +1,28 @@
+#Mind that paths can not contain backslash
+#Make sure there are no spaces after the values
+
+console.font=Helvetica
+console.fontsize=10
+console.height=200
+console.show=true
+console.width=500
+console.x=0
+console.y=0
+extra.class.path=
+file.applications=config/applications.xml
+file.defaultbg=config/defaultbg.jpg
+file.settings=config/settings.txt
+font.sizeoffset=-2
+path.config=config
+remote.show=true
+safearea.color=#ffee00
+safearea.show=true
+tv.center=true
+tv.x=0
+tv.y=0
+tv.screenwidth=800
+tv.screenheight=600
+safearea.x=10
+safearea.y=10
+safearea.width=780
+safearea.height=580
